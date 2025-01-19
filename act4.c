@@ -55,6 +55,16 @@ void next_generation(int rows, int cols, int current[rows][cols], int next[rows]
     }
 }
 
+int grids_are_equal(int rows, int cols, int grid1[rows][cols], int grid2[rows][cols]){
+    for(int i=0;i<rows;i++){
+        for(int j=0; j<cols;j++){
+            if(grid1[i][j] != grid2[i][j]){
+                return 0;//no son iguals
+            }
+        }
+    }
+}
+
 int main(int argc, char *argv[]) {
     if (argc != 4) {
         printf("Use: %s <NumRows> <NumCols> <NumGenerations>\n", argv[0]);
@@ -72,23 +82,38 @@ int main(int argc, char *argv[]) {
 
     int current[rows][cols];
     int next[rows][cols];
+    int prev[rows][cols];
 
     initialize_grid(rows, cols, current);
 
     for (int g = 0; g < generations; g++) {
         system("clear");
-        printf("Generation %d:\n", g+1);
+        printf("Generación %d:\n", g+1);
         display_grid(rows, cols, current);
+
+        // Copy the actual to compare in the iteration
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                prev[i][j] = current[i][j];
+            }
+        }
+
         next_generation(rows, cols, current, next);
 
-        // Copy of the actual generation for the next cycle
+        // verify if it is static
+        if (grids_are_equal(rows, cols, current, next)) {
+            printf("It is static. Ending the game.\n");
+            break;
+        }
+
+        // Copy of the next generation to the actual one for the next iteration
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 current[i][j] = next[i][j];
             }
         }
 
-        usleep(500000);  // 0,5 segs
+        usleep(500000); // 0.5 segs
     }
 
     return 0;
